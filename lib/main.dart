@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
               final position = listScrollController.position.maxScrollExtent;
               listScrollController.animateTo(
                 position,
-                duration: const Duration(seconds: 2),
+                duration: const Duration(seconds: 3),
                 curve: Curves.easeOut,
               );
             });
