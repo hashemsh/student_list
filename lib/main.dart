@@ -37,6 +37,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  ScrollController listScrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,7 +52,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 builder: (context) => _AddStudentForm(),
               ),
             );
-            setState(() {});
+            setState(() {
+              final position = listScrollController.position.maxScrollExtent;
+              listScrollController.animateTo(
+                position,
+                duration: const Duration(seconds: 2),
+                curve: Curves.easeOut,
+              );
+            });
           },
           label: Row(
             children: const [
@@ -65,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
           builder: (context, snapshot) {
             if (snapshot.hasData && snapshot.data != null) {
               return ListView.builder(
+                  controller: listScrollController,
                   padding: const EdgeInsets.only(bottom: 84),
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
