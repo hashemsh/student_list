@@ -16,27 +16,56 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        inputDecorationTheme: const InputDecorationTheme(
+          border: OutlineInputBorder(),
+        ),
+        colorScheme:
+            ColorScheme.fromSwatch(primarySwatch: Colors.blue).copyWith(
+          secondary: const Color(0xff16E5A7),
+        ),
       ),
       home: const HomeScreen(),
     );
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: const Text('Flutter Expert'),
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () async {
+            await Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => _AddStudentForm(),
+              ),
+            );
+            setState(() {});
+          },
+          label: Row(
+            children: const [
+              Icon(Icons.add),
+              Text('Add Student'),
+            ],
+          ),
+        ),
         body: FutureBuilder<List<StudentData>>(
           future: getStudents(),
           builder: (context, snapshot) {
             if (snapshot.hasData && snapshot.data != null) {
               return ListView.builder(
+                  padding: const EdgeInsets.only(bottom: 84),
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
                     return _Student(
@@ -50,6 +79,85 @@ class HomeScreen extends StatelessWidget {
             }
           },
         ));
+  }
+}
+
+class _AddStudentForm extends StatelessWidget {
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lasttNameController = TextEditingController();
+  final TextEditingController _courseController = TextEditingController();
+  final TextEditingController _scoreController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Add New Student'),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          try {
+            final newStudentData = await saveStudent(
+              _firstNameController.text,
+              _lasttNameController.text,
+              _courseController.text,
+              int.parse(_scoreController.text),
+            );
+            Navigator.pop(context, newStudentData);
+          } catch (e) {
+            debugPrint(e.toString());
+          }
+        },
+        label: Row(
+          children: const [
+            Icon(Icons.check),
+            Text('Save'),
+          ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            TextField(
+              controller: _firstNameController,
+              decoration: const InputDecoration(
+                label: Text('First Name'),
+              ),
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            TextField(
+              controller: _lasttNameController,
+              decoration: const InputDecoration(
+                label: Text('Last Name'),
+              ),
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            TextField(
+              controller: _courseController,
+              decoration: const InputDecoration(
+                label: Text('Course'),
+              ),
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            TextField(
+              controller: _scoreController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                label: Text('Score'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
